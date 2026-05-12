@@ -1,11 +1,9 @@
-import urllib.request
-from collections import defaultdict
 import os
+from collections import defaultdict
 
-url = "https://zip.cm.edu.kg/all.txt"
-
-with urllib.request.urlopen(url) as r:
-    lines = r.read().decode("utf-8").splitlines()
+# 直接讀本地文件，不再重新下載
+with open("all.txt", "r", encoding="utf-8") as f:
+    lines = f.read().splitlines()
 
 groups = defaultdict(list)
 
