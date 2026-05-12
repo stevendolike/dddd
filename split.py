@@ -14,10 +14,11 @@ for line in lines:
     region = line.split("#", 1)[1].upper() if "#" in line else "UNKNOWN"
     groups[region].append(line)
 
-    # 篩選 443 port：格式為 IP:PORT#REGION
-    part = line.split("#")[0]  # 取 IP:PORT 部分
+    # 篩選 443 port，只保留 IP
+    part = line.split("#")[0]  # IP:PORT
     if part.endswith(":443"):
-        groups_443[region].append(line)
+        ip = part.split(":")[0]  # 只取 IP
+        groups_443[region].append(ip)
 
 os.makedirs("regions", exist_ok=True)
 os.makedirs("regions_443", exist_ok=True)
