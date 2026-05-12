@@ -8,6 +8,9 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+permissions:
+  contents: write        # ← 加這個
+
 jobs:
   split:
     runs-on: ubuntu-latest
@@ -16,7 +19,7 @@ jobs:
 
       - name: Download all.txt
         run: |
-          curl -v -A "Mozilla/5.0" -o all.txt "https://zip.cm.edu.kg/all.txt"
+          curl -A "Mozilla/5.0" -o all.txt "https://zip.cm.edu.kg/all.txt"
           echo "Downloaded $(wc -l < all.txt) lines"
 
       - name: Split by region
