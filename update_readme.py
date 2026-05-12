@@ -3,29 +3,37 @@ from datetime import datetime, timezone
 
 REPO = os.environ.get("GITHUB_REPOSITORY", "your-username/your-repo")
 BRANCH = "main"
-BASE_RAW = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}/regions"
+BASE_RAW = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}"
 
-region_files = sorted(f for f in os.listdir("regions") if f.endswith(".txt"))
+def build_table(directory):
+    files = sorted(f for f in os.listdir(directory) if f.endswith(".txt"))
+    rows = []
+    for fname in files:
+        code = fname.replace(".txt", "")
+        count = sum(1 for line in open(f"{directory}/{fname}", encoding="utf-8") if line.strip())
+        raw_url = f"{BASE_RAW}/{directory}/{fname}"
+        rows.append(f"| {code} | {count} | [raw]({raw_url}) |")
+    return "\n".join(rows)
 
-rows = []
-for fname in region_files:
-    code = fname.replace(".txt", "")
-    count = sum(1 for line in open(f"regions/{fname}", encoding="utf-8") if line.strip())
-    raw_url = f"{BASE_RAW}/{fname}"
-    rows.append(f"| {code} | {count} | [raw]({raw_url}) |")
-
-table = "\n".join(rows)
+table_all = build_table("regions")
+table_443 = build_table("regions_443")
 updated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 readme = f"""# IP List by Region
 
 自動從 [all.txt](https://zip.cm.edu.kg/all.txt) 抓取並按國家代碼分類，每日更新。
 
-## 地區列表
+## 全部 Port
 
 | 國家代碼 | 條目數 | Raw URL |
 |----------|--------|---------|
-{table}
+{table_all}
+
+## 僅 443 Port
+
+| 國家代碼 | 條目數 | Raw URL |
+|----------|--------|---------|
+{table_443}
 
 ---
 *最後更新：{updated}*
