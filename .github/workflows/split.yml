@@ -9,7 +9,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
-  contents: write        # ← 加這個
+  contents: write
 
 jobs:
   split:
@@ -30,7 +30,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python3 update_readme.py
 
-- name: Commit results
+      - name: Commit results
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
