@@ -3,7 +3,10 @@ name: Split by Region
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 16 * * *'   # 00:00 HKT
+    - cron: '0 22 * * *'   # 06:00 HKT
+    - cron: '0 4 * * *'    # 12:00 HKT
+    - cron: '0 10 * * *'   # 18:00 HKT
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -35,5 +38,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add regions/ regions_443/ README.md
-          git diff --staged --quiet || git commit -m "Auto update $(date +%F)"
+          git diff --staged --quiet || git commit -m "Auto update $(date +%F %H:%M HKT)"
           git push
