@@ -1,0 +1,28 @@
+name: Split by Region
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download and split
+        run: |
+          curl -f -o all.txt "https://zip.cm.edu.kg/all.txt"
+          python3 split.py
+
+      - name: Update README
+        run: python3 update_readme.py
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add regions/ README.md
+          git diff --staged --quiet || git commit -m "Auto update $(date +%F)"
+          git push
