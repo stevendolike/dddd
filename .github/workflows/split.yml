@@ -5,18 +5,26 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   split:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download and split
+      - name: Download all.txt
         run: |
-          curl -f -o all.txt "https://zip.cm.edu.kg/all.txt"
-          python3 split.py
+          curl -v -A "Mozilla/5.0" -o all.txt "https://zip.cm.edu.kg/all.txt"
+          echo "Downloaded $(wc -l < all.txt) lines"
+
+      - name: Split by region
+        run: python3 split.py
 
       - name: Update README
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: python3 update_readme.py
 
       - name: Commit results
