@@ -27,7 +27,7 @@ jobs:
 
       - name: Download all.json
         run: |
-          curl -v -A "Mozilla/5.0" -o all.json "https://zip.cm.edu.kg/all.json"
+          curl -v -A "Mozilla/5.0" -o all.json "https://yx1.rjj.cc.cd/https%3A%2F%2Fzip.cm.edu.kg%2Fall.json"
           echo "File size: $(wc -c < all.json) bytes"
           head -c 200 all.json
 
