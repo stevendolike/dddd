@@ -25,17 +25,8 @@ jobs:
           curl -A "Mozilla/5.0" -o all.txt "https://zip.cm.edu.kg/all.txt"
           echo "Downloaded $(wc -l < all.txt) lines"
 
-      - name: Download all.json
-        run: |
-          curl -v -A "Mozilla/5.0" -o all.json "https://yx1.rjj.cc.cd/https%3A%2F%2Fzip.cm.edu.kg%2Fall.json"
-          echo "File size: $(wc -c < all.json) bytes"
-          head -c 200 all.json
-
-      - name: Split txt by region
+      - name: Split by region
         run: python3 split.py
-
-      - name: Split json by region + org
-        run: python3 split_json.py
 
       - name: Update README
         env:
@@ -46,6 +37,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add regions/ regions_443/ regions_json/ regions_json_443/ README.md
-          git diff --staged --quiet || git commit -m "Auto update $(date '+%Y-%m-%d %H:%M HKT')"
+          git add regions/ regions_443/ README.md
+          git diff --staged --quiet || git commit -m "Auto update $(date +%F %H:%M HKT)"
           git push
