@@ -27,8 +27,9 @@ jobs:
 
       - name: Download all.json
         run: |
-          curl -A "Mozilla/5.0" -o all.json "https://zip.cm.edu.kg/all.json"
-          echo "Downloaded $(wc -c < all.json) bytes"
+          curl -v -A "Mozilla/5.0" -o all.json "https://zip.cm.edu.kg/all.json"
+          echo "File size: $(wc -c < all.json) bytes"
+          head -c 200 all.json
 
       - name: Split txt by region
         run: python3 split.py
