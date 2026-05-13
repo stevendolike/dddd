@@ -1,34 +1,43 @@
+import json
 import os
 from collections import defaultdict
 
-with open("all.txt", "r", encoding="utf-8") as f:
-    lines = f.read().splitlines()
+with open("all.json", "r", encoding="utf-8") as f:
+    data = json.load(f)
 
-groups = defaultdict(list)
-groups_443 = defaultdict(list)
+# { country: { org: [lines] } }
+groups = defaultdict(lambda: defaultdict(list))
+groups_443 = defaultdict(lambda: defaultdict(list))
 
-for line in lines:
-    line = line.strip()
-    if not line:
-        continue
-    region = line.split("#", 1)[1].upper() if "#" in line else "UNKNOWN"
-    groups[region].append(line)
+for item in data:
+    ip = item.get("ip", "")
+    ports = item.get("port", [])
+    meta = item.get("meta", {})
+    country = meta.get("country", "UNKNOWN").upper()
+    org = meta.get("asOrganization", "UNKNOWN")
+    # 清理 org 名稱，避免非法字符出現在文件名
+    org_safe = "".join(c if c.isalnum() or c in " .-_()" else "_" for c in org).strip()
 
-    # 篩選 443 port，只保留 IP
-    part = line.split("#")[0]  # IP:PORT
-    if part.endswith(":443"):
-        ip = part.split(":")[0]  # 只取 IP
-        groups_443[region].append(ip)
+    for port in ports:
+        line = f"{ip}:{port}"
+        groups[country][org_safe].append(line)
+        if port == 443:
+            groups_443[country][org_safe].append(ip)
 
-os.makedirs("regions", exist_ok=True)
-os.makedirs("regions_443", exist_ok=True)
+# 寫入 regions_json/
+for country, orgs in groups.items():
+    for org, entries in orgs.items():
+        path = f"regions_json/{country}"
+        os.makedirs(path, exist_ok=True)
+        with open(f"{path}/{org}.txt", "w", encoding="utf-8") as f:
+            f.write("\n".join(entries))
+        print(f"regions_json/{country}/{org}.txt — {len(entries)} 條")
 
-for region, entries in groups.items():
-    with open(f"regions/{region}.txt", "w", encoding="utf-8") as f:
-        f.write("\n".join(entries))
-    print(f"regions/{region}.txt — {len(entries)} 條")
-
-for region, entries in groups_443.items():
-    with open(f"regions_443/{region}.txt", "w", encoding="utf-8") as f:
-        f.write("\n".join(entries))
-    print(f"regions_443/{region}.txt — {len(entries)} 條 (443 only)")
+# 寫入 regions_json_443/ (純 IP)
+for country, orgs in groups_443.items():
+    for org, entries in orgs.items():
+        path = f"regions_json_443/{country}"
+        os.makedirs(path, exist_ok=True)
+        with open(f"{path}/{org}.txt", "w", encoding="utf-8") as f:
+            f.write("\n".join(entries))
+        print(f"regions_json_443/{country}/{org}.txt — {len(entries)} 條 (443 only)")
